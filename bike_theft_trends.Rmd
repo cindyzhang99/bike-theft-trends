@@ -1,0 +1,96 @@
+---
+title: "How Bike Theft Trends in Toronto Have Changed Over Time"
+subtitle: "And How Cyclists Can Leverage This Information to Keep Their Bikes Safe"
+author: "Ricky Yuen, Xinyi Zhang"
+date: "3/5/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+- bike purchase
+- risk assessment
+- if and how they changed over time
+- bike features and risk factors associated with bike theft
+story
+- meaningful title
+- introduction: goal
+- clear sections with meaningful section headers
+- for each visualization: what question the visualization addresses
+  - what the reader should see that is useful/interesting for understanding the story
+  - how its analysis leads to new question and the visualization that follows
+- summarize main finding and actionable insights
+
+```{r}
+library(ggmap)
+library(ggplot2)
+library(tidyverse)
+library(latticeExtra)
+data_raw <- read.csv("bicycle-thefts-2014-2019.csv")
+```
+- trends over months and years
+- costs over time
+
+```{r}
+data$Cost_of_Bike[is.na(data$Cost_of_Bike)] <- 0
+data_month <- data %>%
+  group_by(Occurrence_Year, Occurrence_Month) %>%
+  summarise(frequency=n(), cost=sum(Cost_of_Bike))
+data_month$Occurrence_Date <- zoo::as.yearmon(paste(data_month$Occurrence_Year, data_month$Occurrence_Month), "%Y %m")
+```
+
+```{r}
+ggplot(data=data_month) + 
+  geom_line(aes(x=Occurrence_Date, y=frequency)) +
+  geom_point(aes(x=Occurrence_Date, y=frequency))
+```
+```{r}
+data_year <- data_month %>%
+  group_by(Occurrence_Year) %>%
+  summarise(frequency=sum(frequency),
+            cost=sum(cost))
+
+obj1 <- xyplot(frequency ~ Occurrence_Year, data_year, type="l")
+obj2 <- xyplot(cost ~ Occurrence_Year, data_year, type="l")
+doubleYScale(obj1, obj2, text=c("Frequency", "Cost"), add.ylab2 = TRUE)
+```
+- primary offense over time
+- make, speed, color
+- location of theft
+- location of most thefts
+- time of day
+```{r}
+data_offense <- data %>%
+  filter(str_detect(Primary_Offence, "THEFT") | str_detect(Primary_Offence, "B&E")) %>%
+  mutate(Primary_Offence=str_replace(Primary_Offence, "THEFT.*", "Theft")) %>%
+  mutate(Primary_Offence=str_replace(Primary_Offence, "B&E.*", "B&E"))
+
+data_offense <- data_offense %>%
+  group_by(Occurrence_Year, Primary_Offence) %>%
+  summarise(frequency=n())
+
+data_offense %>% ggplot(aes(x=Occurrence_Year, y=frequency, fill=Primary_Offence)) +
+  geom_bar(stat="identity")
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
