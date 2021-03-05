@@ -1,38 +1,38 @@
 ---
 title: "How Bike Theft Trends in Toronto Have Changed Over Time"
-subtitle: "And How Cyclists Can Leverage This Information to Keep Their Bikes Safe"
+subtitle: "And How Cyclists Can Keep Their Bikes Safe"
 author: "Ricky Yuen, Xinyi Zhang"
 date: "3/5/2021"
 output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
+# don't show code in data-driven article
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 ```
 
-- bike purchase
-- risk assessment
-- if and how they changed over time
-- bike features and risk factors associated with bike theft
-story
-- meaningful title
-- introduction: goal
-- clear sections with meaningful section headers
-- for each visualization: what question the visualization addresses
-  - what the reader should see that is useful/interesting for understanding the story
-  - how its analysis leads to new question and the visualization that follows
-- summarize main finding and actionable insights
-
 ```{r}
+# set up libraries and load data
 library(ggmap)
 library(ggplot2)
 library(tidyverse)
 library(latticeExtra)
+
 data <- read.csv("bicycle-thefts-2014-2019.csv")
 ```
-- trends over months and years
-- costs over time
 
+```{r}
+data_recovered <- data %>% group_by(Status) %>%
+  summarise(count=n())
+```
+
+
+# Introduction
+In August of 2020, a group of bike thieves made headlines when they were caught on video attempting to steal several bikes from a gated garage in downtown Toronto using a power saw. 11 months earlier, a thief was filmed cutting off the lock of a $1500 bike in Toronto's financial district in broad daylight. Unfortunately, videos like these capture only a small proportion of the bike thefts that occur in Toronto every year. According to the bike theft reports released by the Toronto Police Service, over 21,500 bikes have been stolen from 2014 to 2019. Unfortunately, only around 1% of those bikes have been recovered. 
+
+In this article, we will analyze the aforementioned bike theft reports to explore how bike theft trends have changed over time. Cyclists can leverage the patterns we have identified to assess and minimize their risk of becoming a victim of bike theft.
+
+# How have the number of bike thefts changed over time?
 ```{r}
 data$Cost_of_Bike[is.na(data$Cost_of_Bike)] <- 0
 data_month <- data %>%
@@ -56,6 +56,20 @@ obj1 <- xyplot(frequency ~ Occurrence_Year, data_year, type="l")
 obj2 <- xyplot(cost ~ Occurrence_Year, data_year, type="l")
 doubleYScale(obj1, obj2, text=c("Frequency", "Cost"), add.ylab2 = TRUE)
 ```
+- bike purchase
+- risk assessment
+- if and how they changed over time
+- bike features and risk factors associated with bike theft
+story
+- clear sections with meaningful section headers
+- for each visualization: what question the visualization addresses
+  - what the reader should see that is useful/interesting for understanding the story
+  - how its analysis leads to new question and the visualization that follows
+- summarize main finding and actionable insights
+
+- trends over months and years
+- costs over time
+
 - primary offense over time
 ```{r}
 data_offense <- data %>%
@@ -236,3 +250,8 @@ theme(axis.text.x = element_text(angle = 90)) + xlab("Month") + ylab("Number of 
   annotate("text", x = "2018/07/01", y = 0, label = "2018") + 
   annotate("text", x = "2019/07/01", y = 0, label = "2019")
 ```
+
+# References
+https://toronto.ctvnews.ca/my-jaw-dropped-attempted-bike-theft-by-power-saw-wielding-suspects-caught-on-camera-1.5080725#:~:text=According%20to%20Toronto%20police%20data,bikes%20have%20been%20reported%20recovered.&text=Topping%20the%20list%20are%20communities,cases%20were%20reported%20to%20police.
+
+https://www.cbc.ca/news/canada/toronto/brazen-daylight-bike-theft-1.5272602
