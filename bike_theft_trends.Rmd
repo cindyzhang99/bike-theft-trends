@@ -28,7 +28,7 @@ library(ggmap)
 library(ggplot2)
 library(tidyverse)
 library(latticeExtra)
-data_raw <- read.csv("bicycle-thefts-2014-2019.csv")
+data <- read.csv("bicycle-thefts-2014-2019.csv")
 ```
 - trends over months and years
 - costs over time
