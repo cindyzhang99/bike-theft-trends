@@ -74,3 +74,85 @@ data_offense <- data_offense %>%
 data_offense %>% ggplot(aes(x=Occurrence_Year, y=frequency, fill=Primary_Offence)) +
   geom_bar(stat="identity")
 ```
+- density map of stolen bikes
+- location of thefts
+
+```{r, message=FALSE}
+data <- read.csv("bicycle-thefts-2014-2019.csv")
+
+map <- qmplot(Long, Lat, data=data, maptype="toner", geom="blank", 
+              xlab="Longitude", ylab="Latitude")
+
+map + geom_point() +
+  stat_density2d(aes(fill=..level..), geom="polygon", alpha=.2, colour="red") +
+  scale_fill_gradient2(low="white", mid="yellow", high="red")
+
+```
+- most stolen bike make
+```{r}
+makes <- plyr::count(data, "Bike_Make")
+sorted_makes <- makes[order(-makes$freq),]
+sorted_makes$Bike_Make <- gsub("^OT\\s", "OTHER", sorted_makes$Bike_Make)
+sorted_makes$Bike_Make <- gsub("^UK\\s", "UNKNOWN MAKE", sorted_makes$Bike_Make)
+sorted_makes$Bike_Make <- gsub("^TR\\s", "TREK", sorted_makes$Bike_Make)
+sorted_makes$Bike_Make <- gsub("^NO\\s", "NORCO", sorted_makes$Bike_Make)
+sorted_makes$Bike_Make <- gsub("^CC\\s", "CCM", sorted_makes$Bike_Make)
+sorted_makes$Bike_Make <- gsub("^GI\\s", "GIANT", sorted_makes$Bike_Make)
+sorted_makes$Bike_Make <- gsub("^SC\\s", "SCHWINN", sorted_makes$Bike_Make)
+sorted_makes$Bike_Make <- gsub("^CA\\s", "CANNONDALE", sorted_makes$Bike_Make)
+sorted_makes$Bike_Make <- gsub("^KO\\s", "KONA", sorted_makes$Bike_Make)
+sorted_makes$Bike_Make <- gsub("^RA\\s", "RALEIGH", sorted_makes$Bike_Make)
+sorted_makes$Bike_Make <- gsub("^SU\\s", "SUPERCYCLE", sorted_makes$Bike_Make)
+sorted_makes$Bike_Make <- gsub("\\s*$", "", sorted_makes$Bike_Make)
+
+sorted_makes <- plyr::count(sorted_makes, "Bike_Make")
+sorted_makes <- sorted_makes[order(-sorted_makes$freq),]
+sorted_makes <- sorted_makes[3:12,]
+
+ggplot(sorted_makes, aes(Bike_Make, freq)) + geom_bar(stat="identity") +
+  xlab("Bike Make") + ylab("Number of Bikes Stolen") +
+  scale_x_discrete(guide = guide_axis(n.dodge=2)) + theme_bw()
+```
+- Which neighbourhood had the most bikes stolen from
+
+```{r}
+neighbourhood <- plyr::count(data, "Neighbourhood")
+sorted_neighbourhood <- neighbourhood[order(-neighbourhood$freq),]
+ggplot(sorted_neighbourhood[1:10,], aes(Neighbourhood, freq)) + 
+  geom_bar(stat="identity") + theme(axis.text.x = element_text(angle = 15)) + 
+  ylab("Number of Bikes Stolen")
+```
+- Month and Year vs Number of Bikes stolen
+
+```{r}
+times <- plyr::count(data, "Occurrence_Date")
+
+times$Occurrence_Date <- gsub("\\s.*$", "", times$Occurrence_Date) 
+
+dates <- c(sprintf("2014/0%d/01",seq(01:12)),
+           sprintf("2015/0%d/01",seq(01:12)),
+           sprintf("2016/0%d/01",seq(01:12)),
+           sprintf("2017/0%d/01",seq(01:12)),
+           sprintf("2018/0%d/01",seq(01:12)),
+           sprintf("2019/0%d/01",seq(01:12)))
+dates <- gsub("/010/", "/10/", dates)
+dates <- gsub("/011/", "/11/", dates)
+dates <- gsub("/012/", "/12/", dates)
+
+months <- c("Jan","Feb","Mar",
+            "Apr","May","Jun",
+            "Jul","Aug","Sep",
+            "Oct","Nov","Dec")
+
+date_lab <- c(months, months, months, months, months, months)
+
+ggplot(times, aes(Occurrence_Date, freq)) + geom_point() + 
+  scale_x_discrete(breaks=dates, labels=date_lab) + theme_bw() +
+theme(axis.text.x = element_text(angle = 90)) + xlab("Month") + ylab("Number of Stolen Bikes") + 
+  annotate("text", x = "2014/07/01", y = 0, label = "2014") + 
+  annotate("text", x = "2015/07/01", y = 0, label = "2015") + 
+  annotate("text", x = "2016/07/01", y = 0, label = "2016") + 
+  annotate("text", x = "2017/07/01", y = 0, label = "2017") + 
+  annotate("text", x = "2018/07/01", y = 0, label = "2018") + 
+  annotate("text", x = "2019/07/01", y = 0, label = "2019")
+```
