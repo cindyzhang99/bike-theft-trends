@@ -161,11 +161,13 @@ data <- read.csv("bicycle-thefts-2014-2019.csv")
 map <- qmplot(Long, Lat, data=data, maptype="toner", geom="blank", 
               xlab="Longitude", ylab="Latitude")
 
-map + geom_point() +
-  stat_density2d(aes(fill=..level..), geom="polygon", alpha=.2, colour="red") +
-  scale_fill_gradient2(low="white", mid="yellow", high="red")
-
+map + geom_point(alpha=0.2, colour="red")
 ```
+```{r}
+map + stat_density2d(aes(fill=..level..), geom="polygon", alpha=.5) +
+  scale_fill_viridis_c()
+```
+
 - most stolen bike make
 ```{r}
 makes <- plyr::count(data, "Bike_Make")
