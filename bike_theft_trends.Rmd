@@ -32,30 +32,57 @@ In August of 2020, a group of bike thieves made headlines when they were caught 
 
 In this article, we will analyze the aforementioned bike theft reports to explore how bike theft trends have changed over time. Cyclists can leverage the patterns we have identified to assess and minimize their risk of becoming a victim of bike theft.
 
-# How have the number of bike thefts changed over time?
+# How have bike theft numbers changed over the past few years at the monthly level?
 ```{r}
 data$Cost_of_Bike[is.na(data$Cost_of_Bike)] <- 0
 data_month <- data %>%
   group_by(Occurrence_Year, Occurrence_Month) %>%
   summarise(frequency=n(), cost=sum(Cost_of_Bike))
 data_month$Occurrence_Date <- zoo::as.yearmon(paste(data_month$Occurrence_Year, data_month$Occurrence_Month), "%Y %m")
+months <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+temps <- c(-3.5, -3, -1.5, 7.5, 16.5, 19.5, 23, 22, 18, 23, 5, 0)
+data_month <- data_month %>% mutate(Temperature=plyr::mapvalues(Occurrence_Month, months, temps))
 ```
 
 ```{r}
 ggplot(data=data_month) + 
-  geom_line(aes(x=Occurrence_Date, y=frequency)) +
-  geom_point(aes(x=Occurrence_Date, y=frequency))
+  geom_line(aes(x=Occurrence_Date, y=frequency, color=Temperature)) +
+  geom_point(aes(x=Occurrence_Date, y=frequency, color=Temperature)) + 
+  scale_color_gradient(low="blue4", high="red3") +
+  labs(x="Date",
+       y="Number of Thefts") + 
+  theme_minimal()
 ```
+After grouping bike thefts by month, the most noticeable pattern that emerges is the cyclic trend between the seasons and theft counts. In the winter when temperatures often fall below freezing, bike theft counts drop to their lowest counts (generally, falling below 100 thefts). On the other hand, in the summer, bike theft counts reach their peak with typically over 500 thefts in the warmest months of the year. 
+
+This seasonal pattern makes sense considering that cyclists are more likely to regularly bike when the weather is warm. This in turn affords bike thieves more opportunities to spot and steal bikes during the summer months compared to the winter months. In fact, our analysis indicates that over 5 times the number of bikes stolen in the winter will be stolen in the summer of that year. Therefore, cyclists should strive to be extra vigilant when storing and locking up their bikes in the summer.
+
+We can also observe that as the years progress, the number of thefts appear to increase during both the summer and winter months. Therefore, we'd like to determine how bike thefts numbers in Toronto have changed over time when weather isn't a factor. 
+
+# How have bike theft numbers changed at the yearly level?
 ```{r}
 data_year <- data_month %>%
   group_by(Occurrence_Year) %>%
   summarise(frequency=sum(frequency),
-            cost=sum(cost))
+            cost=sum(cost)) %>%
+  mutate(cost = cost/1000000)
 
-obj1 <- xyplot(frequency ~ Occurrence_Year, data_year, type="l")
-obj2 <- xyplot(cost ~ Occurrence_Year, data_year, type="l")
-doubleYScale(obj1, obj2, text=c("Frequency", "Cost"), add.ylab2 = TRUE)
+obj1 <- xyplot(frequency ~ Occurrence_Year, data_year, type="l", xlab="Year", ylab="Number of Thefts")
+obj2 <- xyplot(cost ~ Occurrence_Year, data_year, type="l", 
+               xlab="Year", ylab="Cost (in Millions)",
+               col="forestgreen")
+update(doubleYScale(obj1, obj2, add.ylab2 = TRUE),
+  par.settings = simpleTheme(col = c('dodgerblue3','forestgreen')))
 ```
+By aggregating bike theft counts over the course of each year (displayed in blue), we can focus on how the frequency of this crime has changed since 2014. From our visualization, we can easily notice that the number of bike thefts has steadily increased for each year between 2014 and 2018. The largest increase occurred between 2015 and 2016 which saw 15% jump in stolen bikes,  This trend was broken in 2019 as the only year that saw a decrease in the number of bikes thefts. 
+
+Interestingly, although the number of bike thefts decreased in 2019, 
+
+Money
+
+
+
+
 - bike purchase
 - risk assessment
 - if and how they changed over time
@@ -70,21 +97,8 @@ story
 - trends over months and years
 - costs over time
 
-- primary offense over time
-```{r}
-data_offense <- data %>%
-  filter(str_detect(Primary_Offence, "THEFT") | str_detect(Primary_Offence, "B&E")) %>%
-  mutate(Primary_Offence=str_replace(Primary_Offence, "THEFT.*", "Theft")) %>%
-  mutate(Primary_Offence=str_replace(Primary_Offence, "B&E.*", "B&E"))
-
-data_offense <- data_offense %>%
-  group_by(Occurrence_Year, Primary_Offence) %>%
-  summarise(frequency=n())
-
-data_offense %>% ggplot(aes(x=Occurrence_Year, y=frequency, fill=Primary_Offence)) +
-  geom_bar(stat="identity")
-```
 - time of day 
+Therefore, our visualization suggests that cyclists should consider storing their bikes overnight as securely as they do during the if possible.
 
 ```{r}
 data_hourly <- data %>% mutate(Hour = lubridate::hour(Occurrence_Time)) %>%
@@ -216,42 +230,10 @@ ggplot(sorted_neighbourhood[1:10,], aes(Neighbourhood, freq)) +
   geom_bar(stat="identity") + theme(axis.text.x = element_text(angle = 15)) + 
   ylab("Number of Bikes Stolen")
 ```
-- Month and Year vs Number of Bikes stolen
-
-```{r}
-times <- plyr::count(data, "Occurrence_Date")
-
-times$Occurrence_Date <- gsub("\\s.*$", "", times$Occurrence_Date) 
-
-dates <- c(sprintf("2014/0%d/01",seq(01:12)),
-           sprintf("2015/0%d/01",seq(01:12)),
-           sprintf("2016/0%d/01",seq(01:12)),
-           sprintf("2017/0%d/01",seq(01:12)),
-           sprintf("2018/0%d/01",seq(01:12)),
-           sprintf("2019/0%d/01",seq(01:12)))
-dates <- gsub("/010/", "/10/", dates)
-dates <- gsub("/011/", "/11/", dates)
-dates <- gsub("/012/", "/12/", dates)
-
-months <- c("Jan","Feb","Mar",
-            "Apr","May","Jun",
-            "Jul","Aug","Sep",
-            "Oct","Nov","Dec")
-
-date_lab <- c(months, months, months, months, months, months)
-
-ggplot(times, aes(Occurrence_Date, freq)) + geom_point() + 
-  scale_x_discrete(breaks=dates, labels=date_lab) + theme_bw() +
-theme(axis.text.x = element_text(angle = 90)) + xlab("Month") + ylab("Number of Stolen Bikes") + 
-  annotate("text", x = "2014/07/01", y = 0, label = "2014") + 
-  annotate("text", x = "2015/07/01", y = 0, label = "2015") + 
-  annotate("text", x = "2016/07/01", y = 0, label = "2016") + 
-  annotate("text", x = "2017/07/01", y = 0, label = "2017") + 
-  annotate("text", x = "2018/07/01", y = 0, label = "2018") + 
-  annotate("text", x = "2019/07/01", y = 0, label = "2019")
-```
 
 # References
 https://toronto.ctvnews.ca/my-jaw-dropped-attempted-bike-theft-by-power-saw-wielding-suspects-caught-on-camera-1.5080725#:~:text=According%20to%20Toronto%20police%20data,bikes%20have%20been%20reported%20recovered.&text=Topping%20the%20list%20are%20communities,cases%20were%20reported%20to%20police.
 
 https://www.cbc.ca/news/canada/toronto/brazen-daylight-bike-theft-1.5272602
+
+https://www.currentresults.com/Weather/Canada/Ontario/Places/toronto-temperatures-by-month-average.php
