@@ -57,10 +57,6 @@ obj2 <- xyplot(cost ~ Occurrence_Year, data_year, type="l")
 doubleYScale(obj1, obj2, text=c("Frequency", "Cost"), add.ylab2 = TRUE)
 ```
 - primary offense over time
-- make, speed, color
-- location of theft
-- location of most thefts
-- time of day
 ```{r}
 data_offense <- data %>%
   filter(str_detect(Primary_Offence, "THEFT") | str_detect(Primary_Offence, "B&E")) %>%
@@ -74,6 +70,88 @@ data_offense <- data_offense %>%
 data_offense %>% ggplot(aes(x=Occurrence_Year, y=frequency, fill=Primary_Offence)) +
   geom_bar(stat="identity")
 ```
+- time of day 
+
+```{r}
+data_hourly <- data %>% mutate(Hour = lubridate::hour(Occurrence_Time)) %>%
+  group_by(Hour) %>%
+  summarise(frequency=n())
+
+data_hourly %>% ggplot(aes(x=Hour, y=frequency)) +
+  geom_line()
+```
+- type, make, speed, color
+```{r}
+data_makes <- data %>% group_by(Bike_Make) %>%
+  summarise(frequency=n())
+```
+
+
+```{r}
+data_bike <- data %>% filter(Cost_of_Bike > 0) %>%
+  filter(Cost_of_Bike < 25000) %>%
+  mutate(Bike_Type=str_replace(Bike_Type, "BM", "Off-Road")) %>%
+  mutate(Bike_Type=str_replace(Bike_Type, "EL", "Electric")) %>%
+  mutate(Bike_Type=str_replace(Bike_Type, "FO", "Road")) %>%
+  mutate(Bike_Type=str_replace(Bike_Type, "MT", "Off-Road")) %>%
+  mutate(Bike_Type=str_replace(Bike_Type, "OT", "Other")) %>%
+  mutate(Bike_Type=str_replace(Bike_Type, "RC", "Road")) %>%
+  mutate(Bike_Type=str_replace(Bike_Type, "RE", "Other")) %>%
+  mutate(Bike_Type=str_replace(Bike_Type, "RG", "Road")) %>%
+  mutate(Bike_Type=str_replace(Bike_Type, "SC", "Other")) %>%
+  mutate(Bike_Type=str_replace(Bike_Type, "TA", "Road")) %>%
+  mutate(Bike_Type=str_replace(Bike_Type, "TO", "Road")) %>%
+  mutate(Bike_Type=str_replace(Bike_Type, "TR", "Road")) %>%
+  mutate(Bike_Type=str_replace(Bike_Type, "UN", "Road")) %>%
+  mutate(Bike_Make=str_trim(Bike_Make))
+bike_makes <- c("GI", "GIANT", "TR", "TREK", "NO", "NORCO", "CC", "CCM",
+                "SE", "SPECIALIZED", "SC", "SCHWINN", "CA", "CANNONDALE", 
+                "RA", "RALEIGH", "SU", "SUPERCYCLE", "KO", "KONA")
+data_bike <- data_bike %>% filter(Bike_Make %in% bike_makes) %>%
+  mutate(Bike_Make=str_replace(Bike_Make, "GI$", "Giant")) %>%
+  mutate(Bike_Make=str_replace(Bike_Make, "GIANT", "Giant")) %>% 
+  mutate(Bike_Make=str_replace(Bike_Make, "TR$", "Trek")) %>% 
+  mutate(Bike_Make=str_replace(Bike_Make, "TREK", "Trek")) %>% 
+  mutate(Bike_Make=str_replace(Bike_Make, "NO$", "Norco")) %>% 
+  mutate(Bike_Make=str_replace(Bike_Make, "NORCO", "Norco")) %>% 
+  mutate(Bike_Make=str_replace(Bike_Make, "CC$", "CCM")) %>% 
+  mutate(Bike_Make=str_replace(Bike_Make, "SE$", "Specialized")) %>% 
+  mutate(Bike_Make=str_replace(Bike_Make, "SPECIALIZED", "Specialized")) %>% 
+  mutate(Bike_Make=str_replace(Bike_Make, "SC$", "Schwinn")) %>% 
+  mutate(Bike_Make=str_replace(Bike_Make, "SCHWINN", "Schwinn")) %>%
+  mutate(Bike_Make=str_replace(Bike_Make, "CA$", "Cannondale")) %>% 
+  mutate(Bike_Make=str_replace(Bike_Make, "CANNONDALE", "Cannondale")) %>% 
+  mutate(Bike_Make=str_replace(Bike_Make, "RA$", "Raleigh")) %>% 
+  mutate(Bike_Make=str_replace(Bike_Make, "RALEIGH", "Raleigh")) %>% 
+  mutate(Bike_Make=str_replace(Bike_Make, "SU$", "Supercycle")) %>% 
+  mutate(Bike_Make=str_replace(Bike_Make, "SUPERCYCLE", "Supercycle")) %>% 
+  mutate(Bike_Make=str_replace(Bike_Make, "KO$", "Kona")) %>% 
+  mutate(Bike_Make=str_replace(Bike_Make, "KONA", "Kona")) 
+
+data_bike_2 <- data_bike %>% group_by(Bike_Make) %>%
+  summarise(frequency=n())
+
+data_bike %>% ggplot(aes(y=Bike_Make, x=Cost_of_Bike)) +
+  geom_point(aes(color=Bike_Type), alpha=0.25, position="jitter")
+```
+
+
+- location of theft
+```{r}
+data_premise <- data %>%
+  filter(Premise_Type != "Other")
+
+data_premise <- data_premise %>%
+  group_by(Occurrence_Year, Premise_Type) %>%
+  summarise(frequency=n())
+
+data_premise %>% ggplot(aes(x=Occurrence_Year, y=frequency, fill=Premise_Type)) +
+  geom_bar(stat="identity")
+
+```
+
+- location of most thefts
+
 - density map of stolen bikes
 - location of thefts
 
