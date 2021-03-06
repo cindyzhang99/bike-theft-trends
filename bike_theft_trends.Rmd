@@ -143,17 +143,19 @@ map + geom_point(alpha=0.2, colour="#481567FF") +
   theme(legend.position = "none")
 ```
 
-This visualization shows the density of bike thefts across the city. We can observe that the frequency of bike thefts is dense around the downtown area, especially by the waterfront. Whereas the location of bike thefts are more scattered in the suburban areas of Toronto. This trend has not changed within these years, and will possibly be the trend for the years to come.
+This visualization shows the density of bike thefts across the city of Toronto. We can observe that the frequency of bike thefts is perpetually dense in the downtown area, especially around the Waterfront Communities neighbourhood. Furthermore, a dense string of bike thefts along Yonge Street can be observed every year as well. Bike thefts in the more suburban areas of Toronto are fairly uniformly scattered. It appears that these trends have been consistent for the past few years and likely will continue to hold true in the future.
 
-We hypothesize this finding comes from the fact there are more people riding bikes in this downtown area. From the earlier visualization, we also saw an increase in residential bike thefts. So it is notable that the population in this area is significantly more dense when compared to the upper suburban area. 
+This finding is likely a result of the increased business activity and increased population density in downtown Toronto. Because there are more people riding bikes into the downtown area as well as more people living in the downtown area (and thus storing their bikes after dark in the downtown area), it is not too surprising that there are more bike thefts there compared to the rest of Toronto. The correlation between a higher population density in downtown Toronto with a higher density of bike thefts ties in nicely with our visualization of bike theft location types where we observed an increase in the percentage of residential bike thefts.
 
-We see that bike theft is happening all over Toronto. These density plots can be useful in finding the "hotspot" for bike theft locations. So what can we do to avoid your bikes from being stolen?
+These density plots of the location of bike thefts capture high risk areas well. Cyclists commuting or living in these hotspots are advised to take extra precautions when locking or storing their bikes, as the rate of bike theft is significantly higher in those areas.
 
 # Summary
 
-By visualizing the set of bike theft reports from 2014-2019 released by the Toronto Police Service, we are able to identify a variety of 
+By visualizing the dataset of bike theft reports from 2014-2019 released by the Toronto Police Service, we are able to identify a variety of bike theft trends to help cyclists minimize their risk of losing their bike. Unsurprisingly, bike theft trends subscribe to a seasonal schedule with more thefts occurring in the warmer summer months compared to the colder winter months. Unfortunately, the cost of stolen bikes has steadily increased over the past few years while the number of stolen bikes has almost always increased as well. Although the number of bike thefts has dropped in 2019 compared to 2018, the profit of bike thieves has increased over these two years, indicating that increasingly expensive bikes are being targeted.
 
-actionable insights
+Furthermore, we observed that over time, a greater percentage of bike thefts occurred at apartments or houses compared to commercial and outside thefts. Coupled with our visualization of popular bike theft times, it appears that there is an increasing focus on targeting residential areas after dark. This insight is especially relevant for areas of Toronto that have a high population density because these neighbourhoods become the hunting ground of bike thieves after dark.
+
+To keep their bikes safe, we suggest that cyclists be extra vigilant during the summer and when locking or storing their bikes in areas with a high population density. Because of the increase in opportunities to spot and steal bikes, bike theft rates are many times higher during the warmer months and in downtown Toronto compared to the rest of the year and in other parts of Toronto. Additionally, we advise that non-professional cyclists do not purchase overly expensive bicycles because they may be especially targeted by bike thieves who have been stealing increasingly expensive bikes over the past few years. Lastly, due to the increase in residential thefts, we suggest that cyclists purchase strong home security systems for their personal safety and to prevent the theft of their bikes.
 
 # References
 Ricci, Talia. “'It Only Took about 20 Seconds': Video of Man Using Power Tool to Steal Bike Viewed Thousands of Times.” Toronto News, CBC, 6 Sept. 2019, www.cbc.ca/news/canada/toronto/brazen-daylight-bike-theft-1.5272602. 
