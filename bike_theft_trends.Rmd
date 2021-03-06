@@ -28,7 +28,7 @@ data_recovered <- data %>% group_by(Status) %>%
 
 
 # Introduction
-In August of 2020, a group of bike thieves made headlines when they were caught on video attempting to steal several bikes from a gated garage in downtown Toronto using a power saw. 11 months earlier, a thief was filmed cutting off the lock of a $1500 bike in Toronto's financial district in broad daylight. Unfortunately, videos like these capture only a small proportion of the bike thefts that occur in Toronto every year. According to the bike theft reports released by the Toronto Police Service, over 21,500 bikes have been stolen from 2014 to 2019. Unfortunately, only around 1% of those bikes have been recovered. 
+In August of 2020, a group of bike thieves made headlines when they were caught on video attempting to steal several bikes from a gated garage in downtown Toronto using a power saw (Walker). 11 months earlier, a thief was filmed cutting off the lock of a $1500 bike in Toronto's financial district in broad daylight (Ricci). Unfortunately, videos like these capture only a small proportion of the bike thefts that occur in Toronto every year. According to the bike theft reports released by the Toronto Police Service, over 21,500 bikes have been stolen from 2014 to 2019 (Toronto Police Service). Unfortunately, only around 1% of those bikes have been recovered. 
 
 In this article, we will analyze the aforementioned bike theft reports to explore how bike theft trends have changed over time. Cyclists can leverage the patterns we have identified to assess and minimize their risk of becoming a victim of bike theft.
 
@@ -40,6 +40,7 @@ data_month <- data %>%
   summarise(frequency=n(), cost=sum(Cost_of_Bike))
 data_month$Occurrence_Date <- zoo::as.yearmon(paste(data_month$Occurrence_Year, data_month$Occurrence_Month), "%Y %m")
 months <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+# (Osborn)
 temps <- c(-3.5, -3, -1.5, 7.5, 16.5, 19.5, 23, 22, 18, 23, 5, 0)
 data_month <- data_month %>% mutate(Temperature=plyr::mapvalues(Occurrence_Month, months, temps))
 ```
@@ -126,6 +127,8 @@ data_hourly %>% ggplot(aes(x=Hour, y=frequency)) +
 ```
 Overall, it appears that for every year, there is a consistent bike theft pattern that changes depending on the time of day. That is, the number of bike thefts generally starts fairly high after midnight, dips to almost 0 during the morning commute, rises after cyclists park their bikes at work, and dips again during the lunch hour. Then, the number rises again after lunch, dips again during the commute home, and rises again as the night grows later. Furthermore, as the years pass, the number of thefts in the evening (when bikes are stored "safely" at home) has clearly increased. This supports our hypothesis that over time, bike thieves have focused their attention on targeting residential areas after dark. This adds credibility to our suggestion of heightening home security systems to prevent bike thefts in residential areas.
 
+Now that we understand that a majority of bike thefts occur in residential areas, let's determine if there are locations in Toronto where bike thefts are concentrated.
+
 # Where in Toronto do the majority of bike thefts occur?
 ```{r, message=FALSE}
 data <- read.csv("bicycle-thefts-2014-2019.csv")
@@ -142,15 +145,15 @@ map + geom_point(alpha=0.2, colour="#481567FF") +
 
 # Summary
 
-- summarize main finding and actionable insights
+By visualizing the set of bike theft reports from 2014-2019 released by the Toronto Police Service, we are able to identify a variety of 
 
-
+actionable insights
 
 # References
-https://data.torontopolice.on.ca/datasets/bicycle-thefts
+Ricci, Talia. “'It Only Took about 20 Seconds': Video of Man Using Power Tool to Steal Bike Viewed Thousands of Times.” Toronto News, CBC, 6 Sept. 2019, www.cbc.ca/news/canada/toronto/brazen-daylight-bike-theft-1.5272602. 
 
-https://toronto.ctvnews.ca/my-jaw-dropped-attempted-bike-theft-by-power-saw-wielding-suspects-caught-on-camera-1.5080725
+Toronto Police Service. “Bicycle Thefts.” Public Safety Data Portal, 12 Jan. 2020, data.torontopolice.on.ca/ datasets/bicycle-thefts.  
 
-https://www.cbc.ca/news/canada/toronto/brazen-daylight-bike-theft-1.5272602
+Walker, Mike. “'My Jaw Dropped': Attempted Bike Theft by Power Saw-Wielding Suspects Caught on Camera.” Toronto News, CTV, 27 Aug. 2020, toronto.ctvnews.ca/my-jaw-dropped-attempted-bike-theft-by-power-saw-wielding-suspects-caught-on-camera-1.5080725. 
 
-https://www.currentresults.com/Weather/Canada/Ontario/Places/toronto-temperatures-by-month-average.php
+Osborn, Liz. “Toronto Temperatures: Averages by Month.” Current Results: Weather and Science Facts, Current Results Publishing, www.currentresults.com/Weather/Canada/Ontario/Places/toronto-temperatures-by-month-average.php.
