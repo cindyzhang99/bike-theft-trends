@@ -124,8 +124,9 @@ data_hourly %>% ggplot(aes(x=Hour, y=frequency)) +
   theme_minimal() + 
   facet_wrap(~Occurrence_Year)
 ```
+Overall, it appears that for every year, there is a consistent bike theft pattern that changes depending on the time of day. That is, the number of bike thefts generally starts fairly high after midnight, dips to almost 0 during the morning commute, rises after cyclists park their bikes at work, and dips again during the lunch hour. Then, the number rises again after lunch, dips again during the commute home, and rises again as the night grows later. Furthermore, as the years pass, the number of thefts in the evening (when bikes are stored "safely" at home) has clearly increased. This supports our hypothesis that over time, bike thieves have focused their attention on targeting residential areas after dark. This adds credibility to our suggestion of heightening home security systems to prevent bike thefts in residential areas.
 
-
+# Where in Toronto do the majority of bike thefts occur?
 ```{r, message=FALSE}
 data <- read.csv("bicycle-thefts-2014-2019.csv")
 
@@ -139,13 +140,16 @@ map + geom_point(alpha=0.2, colour="#481567FF") +
   theme(legend.position = "none")
 ```
 
+# Summary
 
 - summarize main finding and actionable insights
 
 
 
 # References
-https://toronto.ctvnews.ca/my-jaw-dropped-attempted-bike-theft-by-power-saw-wielding-suspects-caught-on-camera-1.5080725#:~:text=According%20to%20Toronto%20police%20data,bikes%20have%20been%20reported%20recovered.&text=Topping%20the%20list%20are%20communities,cases%20were%20reported%20to%20police.
+https://data.torontopolice.on.ca/datasets/bicycle-thefts
+
+https://toronto.ctvnews.ca/my-jaw-dropped-attempted-bike-theft-by-power-saw-wielding-suspects-caught-on-camera-1.5080725
 
 https://www.cbc.ca/news/canada/toronto/brazen-daylight-bike-theft-1.5272602
 
