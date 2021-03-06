@@ -70,9 +70,9 @@ data_year <- data_month %>%
 obj1 <- xyplot(frequency ~ Occurrence_Year, data_year, type="l", xlab="Year", ylab="Number of Thefts")
 obj2 <- xyplot(cost ~ Occurrence_Year, data_year, type="l", 
                xlab="Year", ylab="Cost (in Millions)",
-               col="#7CAE00")
+               col="#00BA38")
 update(doubleYScale(obj1, obj2, add.ylab2 = TRUE),
-  par.settings = simpleTheme(col = c('#00BFC4','#7CAE00')))
+  par.settings = simpleTheme(col = c('#619CFF','#00BA38')))
 ```
 By aggregating bike theft counts over the course of each year (displayed in blue), we can focus on how the frequency of this crime has changed since 2014 ignoring seasonal factors. From our visualization, we notice that the number of bike thefts has steadily increased for each year between 2014 and 2018. The largest increase occurred between 2015 and 2016 which saw 15% jump in stolen bikes. However, this trend was broken in 2019 which saw a decrease in the number of bikes thefts. 
 
@@ -108,82 +108,23 @@ data_premise %>% ggplot(aes(x=Occurrence_Year, y=percentage, fill=Premise_Type))
 ```
 Two main patterns stand out when we look at the change in theft location type over time: the percentage of thefts occurring at a cyclist's place of residence has increased over time while the percentage of thefts occurring outside has decreased over time. More specifically, the percentage of thefts occurring outside has decreased from 49% to 35% while the percentage of thefts occurring at a residence has increased from 39% to 52%. Therefore, although a plurality of thefts took place outside in 2014, a majority of thefts now take place at an apartment or house now.
 
-We can speculate that due to a more vigilant public, over time thieves find it increasingly difficult to steal bikes in broad daylight. For example, sawing open an expensive bike lock is a lot more suspicious than discreetly picking a cheap bike lock. Therefore, thieves seem to have shifted tactics and 
+We can speculate that due to a more vigilant public, over time thieves find it increasingly difficult to steal bikes in broad daylight. For example, sawing open an expensive bike lock is a lot more suspicious than discreetly picking open a cheap lock. Therefore, thieves seem to have shifted tactics and are now targeting residential areas where they are less likely to be caught. Therefore, it looks like cyclists should consider beefing up their home security, perhaps taking advantage of motion sensor alarms to ward off bike thieves.
 
-thieves
+To determine if our speculation is correct, let's find the time of day when bike thefts typically occur. If the majority of bike thefts occur during the night, when cyclists have stored their bikes at home, our hypothesis would be supported.
 
-Correlated with increase in price
-
-- time of day 
-Therefore, our visualization suggests that cyclists should consider storing their bikes overnight as securely as they do during the if possible.
-
+# At what time during the day do bike thefts typically occur? 
 ```{r}
 data_hourly <- data %>% mutate(Hour = lubridate::hour(Occurrence_Time)) %>%
-  group_by(Hour) %>%
-  summarise(frequency=n())
+  group_by(Occurrence_Year, Hour) %>%
+  mutate(frequency=n())
 
 data_hourly %>% ggplot(aes(x=Hour, y=frequency)) +
-  geom_line() +
+  geom_line(colour="#619CFF") +
   labs(y="Number of Thefts") + 
-  theme_minimal()
-```
-- type, make, speed, color
-```{r}
-data_makes <- data %>% group_by(Bike_Make) %>%
-  summarise(frequency=n())
+  theme_minimal() + 
+  facet_wrap(~Occurrence_Year)
 ```
 
-
-```{r}
-data_bike <- data %>% filter(Cost_of_Bike > 0) %>%
-  filter(Cost_of_Bike < 25000) %>%
-  mutate(Bike_Type=str_replace(Bike_Type, "BM", "Off-Road")) %>%
-  mutate(Bike_Type=str_replace(Bike_Type, "EL", "Electric")) %>%
-  mutate(Bike_Type=str_replace(Bike_Type, "FO", "Road")) %>%
-  mutate(Bike_Type=str_replace(Bike_Type, "MT", "Off-Road")) %>%
-  mutate(Bike_Type=str_replace(Bike_Type, "OT", "Other")) %>%
-  mutate(Bike_Type=str_replace(Bike_Type, "RC", "Road")) %>%
-  mutate(Bike_Type=str_replace(Bike_Type, "RE", "Other")) %>%
-  mutate(Bike_Type=str_replace(Bike_Type, "RG", "Road")) %>%
-  mutate(Bike_Type=str_replace(Bike_Type, "SC", "Other")) %>%
-  mutate(Bike_Type=str_replace(Bike_Type, "TA", "Road")) %>%
-  mutate(Bike_Type=str_replace(Bike_Type, "TO", "Road")) %>%
-  mutate(Bike_Type=str_replace(Bike_Type, "TR", "Road")) %>%
-  mutate(Bike_Type=str_replace(Bike_Type, "UN", "Road")) %>%
-  mutate(Bike_Make=str_trim(Bike_Make))
-bike_makes <- c("GI", "GIANT", "TR", "TREK", "NO", "NORCO", "CC", "CCM",
-                "SE", "SPECIALIZED", "SC", "SCHWINN", "CA", "CANNONDALE", 
-                "RA", "RALEIGH", "SU", "SUPERCYCLE", "KO", "KONA")
-data_bike <- data_bike %>% filter(Bike_Make %in% bike_makes) %>%
-  mutate(Bike_Make=str_replace(Bike_Make, "GI$", "Giant")) %>%
-  mutate(Bike_Make=str_replace(Bike_Make, "GIANT", "Giant")) %>% 
-  mutate(Bike_Make=str_replace(Bike_Make, "TR$", "Trek")) %>% 
-  mutate(Bike_Make=str_replace(Bike_Make, "TREK", "Trek")) %>% 
-  mutate(Bike_Make=str_replace(Bike_Make, "NO$", "Norco")) %>% 
-  mutate(Bike_Make=str_replace(Bike_Make, "NORCO", "Norco")) %>% 
-  mutate(Bike_Make=str_replace(Bike_Make, "CC$", "CCM")) %>% 
-  mutate(Bike_Make=str_replace(Bike_Make, "SE$", "Specialized")) %>% 
-  mutate(Bike_Make=str_replace(Bike_Make, "SPECIALIZED", "Specialized")) %>% 
-  mutate(Bike_Make=str_replace(Bike_Make, "SC$", "Schwinn")) %>% 
-  mutate(Bike_Make=str_replace(Bike_Make, "SCHWINN", "Schwinn")) %>%
-  mutate(Bike_Make=str_replace(Bike_Make, "CA$", "Cannondale")) %>% 
-  mutate(Bike_Make=str_replace(Bike_Make, "CANNONDALE", "Cannondale")) %>% 
-  mutate(Bike_Make=str_replace(Bike_Make, "RA$", "Raleigh")) %>% 
-  mutate(Bike_Make=str_replace(Bike_Make, "RALEIGH", "Raleigh")) %>% 
-  mutate(Bike_Make=str_replace(Bike_Make, "SU$", "Supercycle")) %>% 
-  mutate(Bike_Make=str_replace(Bike_Make, "SUPERCYCLE", "Supercycle")) %>% 
-  mutate(Bike_Make=str_replace(Bike_Make, "KO$", "Kona")) %>% 
-  mutate(Bike_Make=str_replace(Bike_Make, "KONA", "Kona")) 
-
-data_bike_2 <- data_bike %>% group_by(Bike_Make) %>%
-  summarise(frequency=n())
-
-data_bike %>% ggplot(aes(y=Bike_Make, x=Cost_of_Bike)) +
-  geom_point(aes(color=Bike_Type), alpha=0.25, position="jitter")
-```
-
-- density map of stolen bikes
-- location of thefts
 
 ```{r, message=FALSE}
 data <- read.csv("bicycle-thefts-2014-2019.csv")
@@ -197,42 +138,6 @@ map + geom_point(alpha=0.2, colour="#481567FF") +
   facet_wrap(~Occurrence_Year) +
   theme(legend.position = "none")
 ```
-
-- most stolen bike make
-```{r}
-makes <- plyr::count(data, "Bike_Make")
-sorted_makes <- makes[order(-makes$freq),]
-sorted_makes$Bike_Make <- gsub("^OT\\s", "OTHER", sorted_makes$Bike_Make)
-sorted_makes$Bike_Make <- gsub("^UK\\s", "UNKNOWN MAKE", sorted_makes$Bike_Make)
-sorted_makes$Bike_Make <- gsub("^TR\\s", "TREK", sorted_makes$Bike_Make)
-sorted_makes$Bike_Make <- gsub("^NO\\s", "NORCO", sorted_makes$Bike_Make)
-sorted_makes$Bike_Make <- gsub("^CC\\s", "CCM", sorted_makes$Bike_Make)
-sorted_makes$Bike_Make <- gsub("^GI\\s", "GIANT", sorted_makes$Bike_Make)
-sorted_makes$Bike_Make <- gsub("^SC\\s", "SCHWINN", sorted_makes$Bike_Make)
-sorted_makes$Bike_Make <- gsub("^CA\\s", "CANNONDALE", sorted_makes$Bike_Make)
-sorted_makes$Bike_Make <- gsub("^KO\\s", "KONA", sorted_makes$Bike_Make)
-sorted_makes$Bike_Make <- gsub("^RA\\s", "RALEIGH", sorted_makes$Bike_Make)
-sorted_makes$Bike_Make <- gsub("^SU\\s", "SUPERCYCLE", sorted_makes$Bike_Make)
-sorted_makes$Bike_Make <- gsub("\\s*$", "", sorted_makes$Bike_Make)
-
-sorted_makes <- plyr::count(sorted_makes, "Bike_Make")
-sorted_makes <- sorted_makes[order(-sorted_makes$freq),]
-sorted_makes <- sorted_makes[3:12,]
-
-ggplot(sorted_makes, aes(Bike_Make, freq)) + geom_bar(stat="identity") +
-  xlab("Bike Make") + ylab("Number of Bikes Stolen") +
-  scale_x_discrete(guide = guide_axis(n.dodge=2)) + theme_bw()
-```
-- Which neighbourhood had the most bikes stolen from
-
-```{r}
-neighbourhood <- plyr::count(data, "Neighbourhood")
-sorted_neighbourhood <- neighbourhood[order(-neighbourhood$freq),]
-ggplot(sorted_neighbourhood[1:10,], aes(Neighbourhood, freq)) + 
-  geom_bar(stat="identity") + theme(axis.text.x = element_text(angle = 15)) + 
-  ylab("Number of Bikes Stolen")
-```
-
 
 
 - summarize main finding and actionable insights
