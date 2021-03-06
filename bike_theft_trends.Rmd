@@ -140,6 +140,12 @@ map + geom_point(alpha=0.2, colour="#481567FF") +
   theme(legend.position = "none")
 ```
 
+This visualization shows the density of bike thefts across the city. We can observe that the frequency of bike thefts is dense around the downtown area, especially by the waterfront. Whereas the location of bike thefts are more scattered in the suburban areas of Toronto. This trend has not changed within these years, and will possibly be the trend for the years to come.
+
+We hypothesize this finding comes from the fact there are more people riding bikes in this downtown area. From the earlier visualization, we also saw an increase in residential bike thefts. So it is notable that the population in this area is significantly more dense when compared to the upper suburban area. 
+
+We see that bike theft is happening all over Toronto. These density plots can be useful in finding the "hotspot" for bike theft locations. So what can we do to avoid your bikes from being stolen?
+
 # Summary
 
 - summarize main finding and actionable insights
