@@ -70,32 +70,49 @@ data_year <- data_month %>%
 obj1 <- xyplot(frequency ~ Occurrence_Year, data_year, type="l", xlab="Year", ylab="Number of Thefts")
 obj2 <- xyplot(cost ~ Occurrence_Year, data_year, type="l", 
                xlab="Year", ylab="Cost (in Millions)",
-               col="forestgreen")
+               col="#7CAE00")
 update(doubleYScale(obj1, obj2, add.ylab2 = TRUE),
-  par.settings = simpleTheme(col = c('dodgerblue3','forestgreen')))
+  par.settings = simpleTheme(col = c('#00BFC4','#7CAE00')))
 ```
-By aggregating bike theft counts over the course of each year (displayed in blue), we can focus on how the frequency of this crime has changed since 2014. From our visualization, we can easily notice that the number of bike thefts has steadily increased for each year between 2014 and 2018. The largest increase occurred between 2015 and 2016 which saw 15% jump in stolen bikes,  This trend was broken in 2019 as the only year that saw a decrease in the number of bikes thefts. 
+By aggregating bike theft counts over the course of each year (displayed in blue), we can focus on how the frequency of this crime has changed since 2014 ignoring seasonal factors. From our visualization, we notice that the number of bike thefts has steadily increased for each year between 2014 and 2018. The largest increase occurred between 2015 and 2016 which saw 15% jump in stolen bikes. However, this trend was broken in 2019 which saw a decrease in the number of bikes thefts. 
 
-Interestingly, although the number of bike thefts decreased in 2019, 
+Interestingly, although the number of bike thefts decreased in 2019, the profit (in green) made by bike thieves did not. In fact, although the number of bike thefts decreased by a count of 300 between 2018 and 2019, the cost of the bikes stolen in 2019 totaled over $100,000 more than the cost of the bikes stolen in 2018. This indicates that bike thieves have become more discerning about the cost and potential resale value of the bikes they steal. Therefore, amateur cyclists are advised to avoid purchasing extravagant bicycles because they may be easily targeted by bike thieves.
 
-Money
+Considering that bike theft counts have generally increased over time, we'd like to determine the safest place for cyclists to keep their bikes...by identifying where bikes have been usually stolen from over the past few years.
 
+# How have bike theft location types changed over time?
+```{r}
+data_premise <- data %>%
+  filter(Premise_Type != "Other") %>%
+  mutate(Premise_Type=str_replace(Premise_Type, "Apartment", "Residential")) %>%
+  mutate(Premise_Type=str_replace(Premise_Type, "House", "Residential")) %>%
+  mutate(Premise_Type=fct_relevel(Premise_Type, "Outside", "Commercial", "Residential"))
 
+data_premise <- data_premise %>%
+  group_by(Occurrence_Year, Premise_Type) %>%
+  summarise(frequency=n())
 
+data_premise <- data_premise %>%
+  group_by(Occurrence_Year) %>%
+  mutate(total=sum(frequency))
 
-- bike purchase
-- risk assessment
-- if and how they changed over time
-- bike features and risk factors associated with bike theft
-story
-- clear sections with meaningful section headers
-- for each visualization: what question the visualization addresses
-  - what the reader should see that is useful/interesting for understanding the story
-  - how its analysis leads to new question and the visualization that follows
-- summarize main finding and actionable insights
+data_premise <- data_premise %>%
+  mutate(percentage=frequency/total)
 
-- trends over months and years
-- costs over time
+data_premise %>% ggplot(aes(x=Occurrence_Year, y=percentage, fill=Premise_Type)) +
+  geom_bar(stat="identity") +
+  labs(x="Year",
+       y="Percentage",
+       fill="Theft Location Type") + 
+  theme_minimal()
+```
+Two main patterns stand out when we look at the change in theft location type over time: the percentage of thefts occurring at a cyclist's place of residence has increased over time while the percentage of thefts occurring outside has decreased over time. More specifically, the percentage of thefts occurring outside has decreased from 49% to 35% while the percentage of thefts occurring at a residence has increased from 39% to 52%. Therefore, although a plurality of thefts took place outside in 2014, a majority of thefts now take place at an apartment or house now.
+
+We can speculate that due to a more vigilant public, over time thieves find it increasingly difficult to steal bikes in broad daylight. For example, sawing open an expensive bike lock is a lot more suspicious than discreetly picking a cheap bike lock. Therefore, thieves seem to have shifted tactics and 
+
+thieves
+
+Correlated with increase in price
 
 - time of day 
 Therefore, our visualization suggests that cyclists should consider storing their bikes overnight as securely as they do during the if possible.
@@ -106,7 +123,9 @@ data_hourly <- data %>% mutate(Hour = lubridate::hour(Occurrence_Time)) %>%
   summarise(frequency=n())
 
 data_hourly %>% ggplot(aes(x=Hour, y=frequency)) +
-  geom_line()
+  geom_line() +
+  labs(y="Number of Thefts") + 
+  theme_minimal()
 ```
 - type, make, speed, color
 ```{r}
@@ -163,23 +182,6 @@ data_bike %>% ggplot(aes(y=Bike_Make, x=Cost_of_Bike)) +
   geom_point(aes(color=Bike_Type), alpha=0.25, position="jitter")
 ```
 
-
-- location of theft
-```{r}
-data_premise <- data %>%
-  filter(Premise_Type != "Other")
-
-data_premise <- data_premise %>%
-  group_by(Occurrence_Year, Premise_Type) %>%
-  summarise(frequency=n())
-
-data_premise %>% ggplot(aes(x=Occurrence_Year, y=frequency, fill=Premise_Type)) +
-  geom_bar(stat="identity")
-
-```
-
-- location of most thefts
-
 - density map of stolen bikes
 - location of thefts
 
@@ -189,11 +191,11 @@ data <- read.csv("bicycle-thefts-2014-2019.csv")
 map <- qmplot(Long, Lat, data=data, maptype="toner", geom="blank", 
               xlab="Longitude", ylab="Latitude")
 
-map + geom_point(alpha=0.2, colour="red")
-```
-```{r}
-map + stat_density2d(aes(fill=..level..), geom="polygon", alpha=.5) +
-  scale_fill_viridis_c()
+map + geom_point(alpha=0.2, colour="#481567FF") + 
+  stat_density2d(aes(fill=..level..), geom="polygon", alpha=.5) +
+  scale_fill_viridis_c() + 
+  facet_wrap(~Occurrence_Year) +
+  theme(legend.position = "none")
 ```
 
 - most stolen bike make
@@ -230,6 +232,12 @@ ggplot(sorted_neighbourhood[1:10,], aes(Neighbourhood, freq)) +
   geom_bar(stat="identity") + theme(axis.text.x = element_text(angle = 15)) + 
   ylab("Number of Bikes Stolen")
 ```
+
+
+
+- summarize main finding and actionable insights
+
+
 
 # References
 https://toronto.ctvnews.ca/my-jaw-dropped-attempted-bike-theft-by-power-saw-wielding-suspects-caught-on-camera-1.5080725#:~:text=According%20to%20Toronto%20police%20data,bikes%20have%20been%20reported%20recovered.&text=Topping%20the%20list%20are%20communities,cases%20were%20reported%20to%20police.
